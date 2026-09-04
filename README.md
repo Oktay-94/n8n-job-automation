@@ -10,9 +10,9 @@ Dieses Repository ist die **technische Dokumentation** des Systems. Es enthält
 bewusst keine Workflow-Exporte, keine Zugangsdaten und keine Echtdaten —
 siehe [Was hier nicht liegt](#was-hier-nicht-liegt).
 
-![n8n-Uebersicht: 78 Workflows, 13.984 Ausfuehrungen, 0,1 Prozent Fehlerquote](assets/01-workflow-uebersicht.png)
+![n8n-Übersicht: 78 Workflows, 13.984 Ausführungen, 0,1 Prozent Fehlerquote](assets/01-workflow-uebersicht.png)
 
-*Die produktive n8n-Instanz: 78 Workflows, 13.984 Ausfuehrungen, Fehlerquote 0,1 Prozent.*
+*Die produktive n8n-Instanz: 78 Workflows, 13.984 Ausführungen, Fehlerquote 0,1 Prozent.*
 
 ## Das Problem
 
@@ -29,25 +29,25 @@ PostgreSQL-Tabelle sichtbar wird.
 ```mermaid
 flowchart TB
   subgraph Q["Quellen"]
-    BA["Bundesagentur fuer Arbeit<br/>REST v6"]
+    BA["Bundesagentur für Arbeit<br/>REST v6"]
     AZ["Adzuna API<br/>Vor-Ort + Remote"]
     MA["Manuelle Aufnahme<br/>ueber das Cockpit"]
   end
 
   subgraph P["Pipeline (n8n, 28 Workflows)"]
-    NS["Nachschub-Motoren<br/>taeglich 09:00 / 09:15"]
+    NS["Nachschub-Motoren<br/>täglich 09:00 / 09:15"]
     AN["Volltext-Anreicherung"]
-    BW["Scoring<br/>zweistufig, LLM-gestuetzt"]
+    BW["Scoring<br/>zweistufig, LLM-gestützt"]
     B7["Anschreiben erzeugen<br/>41 Knoten"]
-    B8["Lebenslauf + Anlagen<br/>PDF-Buendel"]
+    B8["Lebenslauf + Anlagen<br/>PDF-Bündel"]
     VS["Versand-Kette<br/>Webhooks aus dem Cockpit"]
   end
 
-  subgraph W["Waechter"]
-    FW["Frische-Waechter<br/>tot / lebt / unsicher"]
-    RT["Rueckmeldungs-Tracker<br/>stuendlich"]
-    BO["Bounce-Waechter<br/>alle 15 Min"]
-    ZW["Zufluss-Waechter<br/>meldet stille Ausfaelle"]
+  subgraph W["Wächter"]
+    FW["Frische-Wächter<br/>tot / lebt / unsicher"]
+    RT["Rückmeldungs-Tracker<br/>stündlich"]
+    BO["Bounce-Wächter<br/>alle 15 Min"]
+    ZW["Zufluss-Wächter<br/>meldet stille Ausfälle"]
   end
 
   DB[("PostgreSQL<br/>Tabelle stellen, 64 Spalten")]
@@ -87,9 +87,9 @@ sequenceDiagram
     participant UI as Cockpit
     participant B7 as Anschreiben
     participant VS as Versand
-    participant RT as Rueckmeldungs-Tracker
+    participant RT as Rückmeldungs-Tracker
 
-    Note over NS: taeglich 09:00 und 09:15
+    Note over NS: täglich 09:00 und 09:15
     NS->>Q: REST-Abfrage je Suchprofil
     Q-->>NS: Ergebnisliste
     NS->>DB: neue Stellen anlegen, Status neu
@@ -98,17 +98,17 @@ sequenceDiagram
     SC->>DB: Score und Begruendung schreiben
     UI->>DB: Stellen nach Score sortiert lesen
     UI->>B7: Anschreiben anfordern
-    B7->>DB: Gate pruefen, lebt die Anzeige noch
-    B7->>DB: Anschreiben und PDF-Buendel ablegen
+    B7->>DB: Gate prüfen, lebt die Anzeige noch
+    B7->>DB: Anschreiben und PDF-Bündel ablegen
     UI->>VS: Versand freigeben, zwei Stufen
     VS->>DB: Status beworben, Zeitstempel
-    Note over RT: stuendlich
+    Note over RT: stündlich
     RT->>DB: Antwort einer Stelle zuordnen
 ```
 
 ![Baustein 7 im n8n-Editor](assets/02-baustein7-editor.png)
 
-*Der Workflow "Anschreiben erzeugen" im Editor: 41 Knoten, Gates fuer tote
+*Der Workflow "Anschreiben erzeugen" im Editor: 41 Knoten, Gates für tote
 Anzeigen, Kanal-Erkennung, Retry-Pfad und Telegram-Meldungen.*
 
 ## Lebenszyklus einer Stellenanzeige
@@ -119,11 +119,11 @@ stateDiagram-v2
     Neu --> Bewertet: Scoring Stufe 1
     Bewertet --> Nachbewertet: Zweitmeinung anderes Modell
     Nachbewertet --> Versandfertig: Anschreiben erzeugt
-    Versandfertig --> Beworben: Versand bestaetigt
+    Versandfertig --> Beworben: Versand bestätigt
     Beworben --> Antwort: Tracker ordnet zu
     Antwort --> [*]
 
-    Neu --> Friedhof: Frische-Waechter meldet tot
+    Neu --> Friedhof: Frische-Wächter meldet tot
     Bewertet --> Friedhof: Anzeige offline
     Versandfertig --> Friedhof: Anzeige offline
     Beworben --> Bounce: unzustellbar
@@ -131,7 +131,7 @@ stateDiagram-v2
     Friedhof --> [*]
 ```
 
-Der Frische-Waechter kennt drei Ausgaenge, nicht zwei: tot, lebt und unsicher.
+Der Frische-Wächter kennt drei Ausgänge, nicht zwei: tot, lebt und unsicher.
 Ein unsicherer Befund fuehrt nie zum Aussortieren, sondern zur erneuten Pruefung
 am Folgetag. Eine Anzeige faellt nur bei eindeutigem Nachweis heraus.
 
@@ -154,10 +154,10 @@ sequenceDiagram
     M->>K: aktivieren
     M->>A: alle Aufrufer umhaengen
     M->>K: versionId gleich activeVersionId?
-    Note over O: bleibt als benannte Rueckfallebene
+    Note over O: bleibt als benannte Rückfallebene
 ```
 
-Ohne den vorletzten Schritt sieht die Oberflaeche veroeffentlicht aus, waehrend
+Ohne den vorletzten Schritt sieht die Oberfläche veroeffentlicht aus, waehrend
 weiterhin die alte Fassung feuert. In n8n sind das zwei getrennte Zustaende.
 
 ## Die 28 Workflows
