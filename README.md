@@ -10,6 +10,10 @@ Dieses Repository ist die **technische Dokumentation** des Systems. Es enthält
 bewusst keine Workflow-Exporte, keine Zugangsdaten und keine Echtdaten —
 siehe [Was hier nicht liegt](#was-hier-nicht-liegt).
 
+![n8n-Uebersicht: 78 Workflows, 13.984 Ausfuehrungen, 0,1 Prozent Fehlerquote](assets/01-workflow-uebersicht.png)
+
+*Die produktive n8n-Instanz: 78 Workflows, 13.984 Ausfuehrungen, Fehlerquote 0,1 Prozent.*
+
 ## Das Problem
 
 Eine ernsthafte Bewerbungsphase ist Fließbandarbeit: Anzeigen suchen, aussieben,
@@ -101,6 +105,11 @@ sequenceDiagram
     Note over RT: stuendlich
     RT->>DB: Antwort einer Stelle zuordnen
 ```
+
+![Baustein 7 im n8n-Editor](assets/02-baustein7-editor.png)
+
+*Der Workflow "Anschreiben erzeugen" im Editor: 41 Knoten, Gates fuer tote
+Anzeigen, Kanal-Erkennung, Retry-Pfad und Telegram-Meldungen.*
 
 ## Lebenszyklus einer Stellenanzeige
 
