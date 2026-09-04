@@ -68,6 +68,89 @@ Die Datenbank ist die einzige Wahrheit. Kein Workflow ruft einen anderen über
 geteilten Zustand auf; alles läuft über Spalten in `stellen`. Das macht jeden
 Schritt einzeln nachvollziehbar und jeden Ausfall lokal.
 
+## Ablauf einer Bewerbung
+
+Vom Fund einer Anzeige bis zur zugeordneten Antwort. Jeder Pfeil ist ein
+eigener Workflow; der Zustand liegt ausschliesslich in der Datenbank.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Q as Bundesagentur / Adzuna
+    participant NS as Nachschub-Motor
+    participant DB as PostgreSQL
+    participant SC as Scoring
+    participant UI as Cockpit
+    participant B7 as Anschreiben
+    participant VS as Versand
+    participant RT as Rueckmeldungs-Tracker
+
+    Note over NS: taeglich 09:00 und 09:15
+    NS->>Q: REST-Abfrage je Suchprofil
+    Q-->>NS: Ergebnisliste
+    NS->>DB: neue Stellen anlegen, Status neu
+    NS->>DB: Volltext nachladen
+    Note over SC: zweistufig, zwei Modelle
+    SC->>DB: Score und Begruendung schreiben
+    UI->>DB: Stellen nach Score sortiert lesen
+    UI->>B7: Anschreiben anfordern
+    B7->>DB: Gate pruefen, lebt die Anzeige noch
+    B7->>DB: Anschreiben und PDF-Buendel ablegen
+    UI->>VS: Versand freigeben, zwei Stufen
+    VS->>DB: Status beworben, Zeitstempel
+    Note over RT: stuendlich
+    RT->>DB: Antwort einer Stelle zuordnen
+```
+
+## Lebenszyklus einer Stellenanzeige
+
+```mermaid
+stateDiagram-v2
+    [*] --> Neu: Nachschub-Motor
+    Neu --> Bewertet: Scoring Stufe 1
+    Bewertet --> Nachbewertet: Zweitmeinung anderes Modell
+    Nachbewertet --> Versandfertig: Anschreiben erzeugt
+    Versandfertig --> Beworben: Versand bestaetigt
+    Beworben --> Antwort: Tracker ordnet zu
+    Antwort --> [*]
+
+    Neu --> Friedhof: Frische-Waechter meldet tot
+    Bewertet --> Friedhof: Anzeige offline
+    Versandfertig --> Friedhof: Anzeige offline
+    Beworben --> Bounce: unzustellbar
+    Bounce --> Versandfertig: neuer Kanal gefunden
+    Friedhof --> [*]
+```
+
+Der Frische-Waechter kennt drei Ausgaenge, nicht zwei: tot, lebt und unsicher.
+Ein unsicherer Befund fuehrt nie zum Aussortieren, sondern zur erneuten Pruefung
+am Folgetag. Eine Anzeige faellt nur bei eindeutigem Nachweis heraus.
+
+## Zero-Downtime-Tausch eines aktiven Workflows
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant M as Mensch
+    participant O as Original, aktiv
+    participant K as Kopie, inaktiv
+    participant A as Aufrufer
+
+    M->>O: duplizieren
+    O-->>K: Kopie entsteht
+    M->>K: sofort speichern
+    Note over K: Umbau nur auf der Kopie
+    M->>K: Testfaelle mit erwartetem Ergebnis
+    M->>O: deaktivieren
+    M->>K: aktivieren
+    M->>A: alle Aufrufer umhaengen
+    M->>K: versionId gleich activeVersionId?
+    Note over O: bleibt als benannte Rueckfallebene
+```
+
+Ohne den vorletzten Schritt sieht die Oberflaeche veroeffentlicht aus, waehrend
+weiterhin die alte Fassung feuert. In n8n sind das zwei getrennte Zustaende.
+
 ## Die 28 Workflows
 
 Eine vollständige Beschreibung mit Auslösern und Knotenzahlen steht in
