@@ -31,7 +31,7 @@ flowchart TB
   subgraph Q["Quellen"]
     BA["Bundesagentur für Arbeit<br/>REST v6"]
     AZ["Adzuna API<br/>Vor-Ort + Remote"]
-    MA["Manuelle Aufnahme<br/>ueber das Cockpit"]
+    MA["Manuelle Aufnahme<br/>über das Cockpit"]
   end
 
   subgraph P["Pipeline (n8n, 28 Workflows)"]
@@ -95,7 +95,7 @@ sequenceDiagram
     NS->>DB: neue Stellen anlegen, Status neu
     NS->>DB: Volltext nachladen
     Note over SC: zweistufig, zwei Modelle
-    SC->>DB: Score und Begruendung schreiben
+    SC->>DB: Score und Begründung schreiben
     UI->>DB: Stellen nach Score sortiert lesen
     UI->>B7: Anschreiben anfordern
     B7->>DB: Gate prüfen, lebt die Anzeige noch
@@ -132,8 +132,8 @@ stateDiagram-v2
 ```
 
 Der Frische-Wächter kennt drei Ausgänge, nicht zwei: tot, lebt und unsicher.
-Ein unsicherer Befund fuehrt nie zum Aussortieren, sondern zur erneuten Pruefung
-am Folgetag. Eine Anzeige faellt nur bei eindeutigem Nachweis heraus.
+Ein unsicherer Befund führt nie zum Aussortieren, sondern zur erneuten Prüfung
+am Folgetag. Eine Anzeige fällt nur bei eindeutigem Nachweis heraus.
 
 ## Zero-Downtime-Tausch eines aktiven Workflows
 
@@ -149,16 +149,16 @@ sequenceDiagram
     O-->>K: Kopie entsteht
     M->>K: sofort speichern
     Note over K: Umbau nur auf der Kopie
-    M->>K: Testfaelle mit erwartetem Ergebnis
+    M->>K: Testfälle mit erwartetem Ergebnis
     M->>O: deaktivieren
     M->>K: aktivieren
-    M->>A: alle Aufrufer umhaengen
+    M->>A: alle Aufrufer umhängen
     M->>K: versionId gleich activeVersionId?
     Note over O: bleibt als benannte Rückfallebene
 ```
 
-Ohne den vorletzten Schritt sieht die Oberfläche veroeffentlicht aus, waehrend
-weiterhin die alte Fassung feuert. In n8n sind das zwei getrennte Zustaende.
+Ohne den vorletzten Schritt sieht die Oberfläche veröffentlicht aus, während
+weiterhin die alte Fassung feuert. In n8n sind das zwei getrennte Zustände.
 
 ## Die 28 Workflows
 
